@@ -18,7 +18,7 @@ registry and the browser panel are process-global):
 - id: gatedflow
   name: '@gatedflow/dsh/host'
   config:
-    stateDir: ~/.gatedflow        # engine data root
+    stateDir: ~/.gatedflow        # shared subflow root (read-only)
     gateDeadlineSecs: 1800        # default gate timeout
     shellTimeoutMs: 120000        # default shell step timeout
     auditTailLines: 500           # bounded audit tail
@@ -47,8 +47,8 @@ is missing (gates are then followed through `gf_status` instead).
 
 | Field | Default | Meaning |
 |---|---|---|
-| `stateDir` | `~/.gatedflow` | Shared subflow root (read-only for this plugin); `subflows/` scans here. Workflow state and audit live per workspace under `<workspace_root>/.gatedflow` — the sandbox's workspace-write policy denies writes outside the workspace. |
-| `subflowDirs` | `[]` | Additional subflow directories appended to the default one. |
+| `stateDir` | `~/.gatedflow` | Shared subflow root (read-only for this plugin); `subflows/` scans here, and the calling session's `<workspace_root>/.gatedflow/subflows` is scanned as well (workspace wins on name conflicts). Workflow state and audit live per workspace under `<workspace_root>/.gatedflow` — the sandbox's workspace-write policy denies writes outside the workspace. |
+| `subflowDirs` | `[]` | Additional shared subflow directories (scanned after `stateDir`, before the workspace dir). |
 | `gateDeadlineSecs` | `1800` | Default paused-gate deadline; steps override with `deadline_secs`. |
 | `shellTimeoutMs` | `120000` | Default shell step timeout; steps override with `timeout_ms`. |
 | `auditTailLines` | `500` | Bounded JSONL audit tail per workflow. |
@@ -86,8 +86,9 @@ Environment overrides: `GATEDFLOW_STATE_DIR` (state root),
 - **Persistence follows the workspace.** Workflow state lands in
   `<workspace_root>/.gatedflow/workflows/<id>.json` and its bounded audit
   tail in `<workspace_root>/.gatedflow/audit/<id>.jsonl` — writable under
-  the sandbox's workspace-write policy by construction. `stateDir` only
-  supplies the shared subflow scan root.
+  the sandbox's workspace-write policy by construction. `stateDir` supplies
+  the shared subflow scan root; each workspace supplies its own
+  `.gatedflow/subflows`.
 - **Restore on reference.** Calling `gf_start` with a `workflow_id` that is
   persisted in the workspace restores that workflow instead of starting
   fresh: `running` states come back `paused` (their process is gone);
