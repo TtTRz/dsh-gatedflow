@@ -66,6 +66,8 @@ is missing (gates are then followed through `gf_status`).
 | `GATEDFLOW_STATE_DIR` | `~/.gatedflow` | Shared subflow root (the `stateDir` config wins); workflow state and audit live per workspace under `<workspace_root>/.gatedflow` |
 | `GATEDFLOW_SUBFLOWS_DIR` | — | Extra subflow directory (appended to the scan list) |
 
+Scan order per reload: `stateDir` → config `subflowDirs` → `GATEDFLOW_SUBFLOWS_DIR` → the calling session's `<workspace_root>/.gatedflow/subflows`; later directories override earlier ones on name conflicts (the workspace wins).
+
 ## 3. Tool reference
 
 | Tool | Parameters | Semantics |

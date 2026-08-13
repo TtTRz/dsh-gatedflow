@@ -73,9 +73,11 @@ gf_start({ atomics: [
 
 ### Author a subflow
 
-Drop a JSON file into the subflows directory (`~/.gatedflow/subflows` by
-default, `GATEDFLOW_SUBFLOWS_DIR` to override), then call
-`gf_reload_subflows` — hot-loaded, no restart:
+Drop a JSON file into a subflows directory — the session workspace's
+`.gatedflow/subflows` (scanned automatically, takes precedence on name
+conflicts) or the shared root (`~/.gatedflow/subflows` by default,
+`GATEDFLOW_SUBFLOWS_DIR` to override) — then call `gf_reload_subflows`
+(hot-loaded, no restart):
 
 ```json
 {

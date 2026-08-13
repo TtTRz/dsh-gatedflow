@@ -67,9 +67,10 @@ gf_start({ atomics: [
 
 ### 写一个 subflow
 
-把 JSON 文件放进 subflows 目录（默认 `~/.gatedflow/subflows`，可用
-`GATEDFLOW_SUBFLOWS_DIR` 覆盖），然后调 `gf_reload_subflows`——热加载，
-无需重启：
+把 JSON 文件放进 subflows 目录——会话工作区的 `.gatedflow/subflows`
+（自动扫描，同名优先）或共享根目录（默认 `~/.gatedflow/subflows`，可用
+`GATEDFLOW_SUBFLOWS_DIR` 覆盖）——然后调 `gf_reload_subflows`（热加载，
+无需重启）：
 
 ```json
 {
