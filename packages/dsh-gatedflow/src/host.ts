@@ -93,6 +93,12 @@ function agentCwd(exec: ToolRunContext | undefined): string | undefined {
   return typeof cwd === 'string' && cwd.length > 0 ? cwd : undefined
 }
 
+/** Per-workspace subflow roots for the calling session (workspace wins over shared dirs). */
+function workspaceSubflowDirs(exec: ToolRunContext | undefined): string[] {
+  const cwd = agentCwd(exec)
+  return cwd !== undefined ? [path.join(cwd, '.gatedflow', 'subflows')] : []
+}
+
 // ---------------------------------------------------------------- plugin
 
 export const name = '@gatedflow/dsh'
@@ -251,10 +257,11 @@ export function apply(ctx: Context, config?: Config): void {
         timeoutMs: 3600000,
         output: toolOutput(),
         async execute(args, exec) {
-          await registry.reload()
+          const explicitWorkspace = typeof args.workspace_root === 'string' ? args.workspace_root : agentCwd(exec)
+          await registry.reload(explicitWorkspace !== undefined ? [path.join(explicitWorkspace, '.gatedflow', 'subflows')] : [])
           agentExecutor.bind(exec.agent, exec.signal)
           const atomics = (args.atomics ?? []) as AtomicSpec[]
-          const workspaceRoot = typeof args.workspace_root === 'string' ? args.workspace_root : agentCwd(exec) ?? stateDir
+          const workspaceRoot = explicitWorkspace ?? stateDir
           const requestedId = typeof args.workflow_id === 'string' ? args.workflow_id : undefined
           // A known workflow id restores its persisted state instead of
           // starting fresh (running states come back paused; terminal states
@@ -374,8 +381,8 @@ export function apply(ctx: Context, config?: Config): void {
         parameters: {},
         timeoutMs: 60000,
         output: toolOutput(),
-        async execute() {
-          await registry.reload()
+        async execute(_args, exec) {
+          await registry.reload(workspaceSubflowDirs(exec))
           return asRecord({ subflows: registry.summaries() })
         },
       }),
@@ -392,8 +399,8 @@ export function apply(ctx: Context, config?: Config): void {
         parameters: {},
         timeoutMs: 60000,
         output: toolOutput(),
-        async execute() {
-          const count = await registry.reload()
+        async execute(_args, exec) {
+          const count = await registry.reload(workspaceSubflowDirs(exec))
           return asRecord({ count, names: registry.names() })
         },
       }),

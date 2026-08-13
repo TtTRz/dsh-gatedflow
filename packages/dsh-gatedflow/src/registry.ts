@@ -1,9 +1,13 @@
 /**
  * Subflow registry: builtin presets plus hot-loadable JSON/YAML files.
  *
- * Files live in `GATEDFLOW_SUBFLOWS_DIR` (or `<workspace>/.gatedflow/subflows`
- * in the engine data dir). Every definition passes structural validation
- * before entering the registry; `reload()` re-scans without a restart.
+ * Scanned directories: the configured shared roots (`stateDir`, config
+ * `subflowDirs`, `GATEDFLOW_SUBFLOWS_DIR`) plus per-workspace roots passed to
+ * `reload(extraDirs)` (typically `<workspace>/.gatedflow/subflows`). Later
+ * directories override earlier ones on name conflicts, so the session
+ * workspace wins over shared definitions. Every definition passes structural
+ * validation before entering the registry; `reload()` re-scans without a
+ * restart.
  */
 
 import type { FileSystem } from '@deepseek-ai/dsh-fs'
@@ -49,17 +53,23 @@ export class DslRegistry implements SubflowRegistry {
         name: def.name,
         description: def.description ?? '',
         keywords: def.keywords ?? [],
-        params: def.params,
-        exports: def.exports,
+        // `params`/`exports` are optional in SubflowDef; the DSH tools layer
+        // rejects tool outputs containing `undefined` property values
+        // ("value is not lossless JSON"), so default them here.
+        params: def.params ?? {},
+        exports: def.exports ?? {},
       })
     }
     return out
   }
 
-  /** Re-scan every configured directory; invalid files are skipped loudly. */
-  async reload(): Promise<number> {
+  /**
+   * Re-scan every configured directory plus any per-call extra dirs;
+   * invalid files are skipped loudly. Later dirs override earlier ones.
+   */
+  async reload(extraDirs: string[] = []): Promise<number> {
     this.files.clear()
-    for (const dir of this.dirs) {
+    for (const dir of [...this.dirs, ...extraDirs]) {
       let entries
       try {
         entries = await this.fs.listDir(await this.fs.resolve(dir))
