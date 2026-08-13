@@ -1,0 +1,31 @@
+{
+  "name": "@gatedflow/engine",
+  "version": "0.1.0",
+  "description": "Framework-agnostic gated workflow engine core: declarative subflows, deterministic expansion, human gates, zero-mutation failure continuation. No LLM, no orchestrator dependencies.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "workflow",
+    "gates",
+    "human-in-the-loop",
+    "subflow",
+    "gatedflow"
+  ],
+  "author": "TtTRz"
+}

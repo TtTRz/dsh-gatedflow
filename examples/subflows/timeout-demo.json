@@ -1,0 +1,30 @@
+{
+  "name": "timeout-demo",
+  "description": "Gate deadline demo: an interrupt gate with deadline_secs=3 auto-fails when nobody decides in time (anti-stuck mechanism).",
+  "keywords": [
+    "timeout",
+    "demo"
+  ],
+  "steps": [
+    {
+      "id": "gate",
+      "type": "interrupt",
+      "params": {
+        "message": "This gate auto-fails if nobody decides within 3 seconds.",
+        "deadline_secs": 3
+      },
+      "on_approve": "ok",
+      "on_reject": "abort"
+    },
+    {
+      "id": "ok",
+      "type": "shell",
+      "params": {
+        "command": "echo \"never reached\"",
+        "expect": "true"
+      },
+      "on_success": "next",
+      "on_failure": "abort"
+    }
+  ]
+}

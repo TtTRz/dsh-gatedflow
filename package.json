@@ -1,0 +1,45 @@
+{
+  "name": "dsh-gatedflow",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Gated, durable, human-in-the-loop workflows for DeepSeek Harness — a native port of the gatedflow philosophy (gates as control flow, zero-mutation replan, declarative subflows).",
+  "license": "MIT",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @gatedflow/engine && npm run build -w @gatedflow/dsh",
+    "typecheck": "npm run typecheck -w @gatedflow/engine && npm run typecheck -w @gatedflow/dsh",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run build && npm run typecheck && npm run test"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/cordis-plugin-timer": "^1.1.3",
+    "@deepseek-ai/dsh-fs": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-sandbox": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-shell": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-tools": "^0.1.0-rc.6",
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.31",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "workflow",
+    "gates",
+    "human-in-the-loop",
+    "gatedflow"
+  ],
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.62.4"
+  },
+  "author": "TtTRz"
+}

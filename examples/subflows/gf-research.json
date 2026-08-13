@@ -1,0 +1,45 @@
+{
+  "name": "gf-research",
+  "description": "Demo of handoff: a ReAct task is delegated back to the orchestrator; the structured result is then judged by a conditional.",
+  "keywords": [
+    "handoff",
+    "research",
+    "demo"
+  ],
+  "params": {
+    "question": {
+      "required": true,
+      "description": "The research question"
+    }
+  },
+  "steps": [
+    {
+      "id": "gather",
+      "type": "handoff",
+      "params": {
+        "task_hint": "Research and answer: ${question}. When done, call gf_advance(handoff_complete, result={found: true/false, answer: \"...\"})."
+      },
+      "on_success": "judge",
+      "on_failure": "abort"
+    },
+    {
+      "id": "judge",
+      "type": "conditional",
+      "params": {
+        "expr": "{gather.result.found} == true"
+      },
+      "on_true": "report_ok",
+      "on_false": "abort"
+    },
+    {
+      "id": "report_ok",
+      "type": "shell",
+      "params": {
+        "command": "echo \"ANSWER: {gather.result.answer}\"",
+        "expect": "true"
+      },
+      "on_success": "next",
+      "on_failure": "abort"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "name": "example-release",
+  "description": "Example release flow: build with expect verification + pause_on_failure retry + a human review gate.",
+  "keywords": [
+    "example",
+    "release"
+  ],
+  "params": {
+    "branch": {
+      "required": true,
+      "description": "Branch name"
+    }
+  },
+  "steps": [
+    {
+      "id": "build",
+      "type": "shell",
+      "params": {
+        "command": "echo \"building ${branch}\" && mkdir -p .gatedflow/example && echo ok > .gatedflow/example/build.txt",
+        "expect": "test -f .gatedflow/example/build.txt",
+        "max_retries": 1,
+        "pause_on_failure": true
+      },
+      "on_success": "review",
+      "on_failure": "abort"
+    },
+    {
+      "id": "review",
+      "type": "interrupt",
+      "params": {
+        "message": "Build complete: {build.stdout}\nPublish ${branch}?"
+      },
+      "on_approve": "release",
+      "on_reject": "abort"
+    },
+    {
+      "id": "release",
+      "type": "shell",
+      "params": {
+        "command": "echo \"released ${branch}\"",
+        "expect": "true"
+      },
+      "on_success": "next",
+      "on_failure": "abort"
+    }
+  ]
+}

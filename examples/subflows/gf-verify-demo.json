@@ -1,0 +1,58 @@
+{
+  "name": "gf-verify-demo",
+  "description": "Demo of the gate loop: shell+expect verification → interrupt human gate (panel approval) → publish. A single Ref runs the deterministic path (no pre_start_gate wrapper).",
+  "keywords": [
+    "demo",
+    "gate",
+    "human-review",
+    "verification"
+  ],
+  "params": {
+    "note": {
+      "required": false,
+      "description": "Extra note carried into the artifact"
+    }
+  },
+  "steps": [
+    {
+      "id": "prep",
+      "type": "shell",
+      "params": {
+        "command": "echo \"prep ok ${note}\"",
+        "expect": "true"
+      },
+      "on_success": "check",
+      "on_failure": "abort"
+    },
+    {
+      "id": "check",
+      "type": "shell",
+      "params": {
+        "command": "mkdir -p .gatedflow/demo && echo \"artifact: built $(date +%s)\" > .gatedflow/demo/artifact.txt",
+        "expect": "test -f .gatedflow/demo/artifact.txt"
+      },
+      "on_success": "review",
+      "on_failure": "abort"
+    },
+    {
+      "id": "review",
+      "type": "interrupt",
+      "params": {
+        "header": "gatedflow gate",
+        "message": "The artifact was generated and passed verification (.gatedflow/demo/artifact.txt).\nConfirm to continue publishing?"
+      },
+      "on_approve": "ship",
+      "on_reject": "abort"
+    },
+    {
+      "id": "ship",
+      "type": "shell",
+      "params": {
+        "command": "echo \"SHIPPED: $(cat .gatedflow/demo/artifact.txt)\"",
+        "expect": "true"
+      },
+      "on_success": "next",
+      "on_failure": "abort"
+    }
+  ]
+}

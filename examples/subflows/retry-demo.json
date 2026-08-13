@@ -1,0 +1,32 @@
+{
+  "name": "retry-demo",
+  "description": "Retry continuation demo: the first step depends on an external probe file; after failure it pauses (pause_on_failure) for repair, then retries.",
+  "keywords": [
+    "retry",
+    "demo"
+  ],
+  "steps": [
+    {
+      "id": "probe",
+      "type": "shell",
+      "params": {
+        "command": "test -f /tmp/gf-retry-probe.txt && cat /tmp/gf-retry-probe.txt",
+        "expect": "test -f /tmp/gf-retry-probe.txt",
+        "max_retries": 1,
+        "pause_on_failure": true
+      },
+      "on_success": "finish",
+      "on_failure": "abort"
+    },
+    {
+      "id": "finish",
+      "type": "shell",
+      "params": {
+        "command": "echo DONE-RETRY-TEST",
+        "expect": "true"
+      },
+      "on_success": "next",
+      "on_failure": "abort"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "interrupt-demo",
+  "description": "Interruption semantics demo: a long shell step waits for a probe file and can be interrupted by /stop — interruption pauses, never fails.",
+  "keywords": [
+    "interrupt",
+    "demo"
+  ],
+  "steps": [
+    {
+      "id": "wait",
+      "type": "shell",
+      "params": {
+        "command": "for i in $(seq 1 90); do [ -f /tmp/gf-resume-go ] && break; sleep 1; done; [ -f /tmp/gf-resume-go ]",
+        "expect": "true",
+        "timeout_ms": 120000
+      },
+      "on_success": "finish",
+      "on_failure": "abort"
+    },
+    {
+      "id": "finish",
+      "type": "shell",
+      "params": {
+        "command": "echo INTERRUPT-RESUME-OK",
+        "expect": "true"
+      },
+      "on_success": "next",
+      "on_failure": "abort"
+    }
+  ]
+}
