@@ -41,13 +41,13 @@ user task ──► agent composes atomics (Ref/Inline) ──► gf_start
   executes.
 - **No LLM in the engine.** Semantic judgment happens on the agent side and
   returns *structured fields*; the engine only evaluates deterministic
-  operators (`==`, `!=`, `>`, `<`, `contains`, `&&`, `||`, `!`).
+  operators (`==`, `!=`, `>=`, `<=`, `>`, `<`, `contains`, `&&`, `||`, `!`).
 
 ## Quick start
 
 ```bash
 npm install
-npm run check   # build + typecheck + 49 unit tests
+npm run check   # build + typecheck + unit tests
 ```
 
 ### Run a workflow (as a DSH user)
@@ -108,14 +108,15 @@ See [`examples/subflows/`](examples/subflows) for more.
 
 ```bash
 npm install
-npm run test          # engine unit tests (vitest, 48 tests)
+npm run test          # unit tests (vitest, engine + adapter)
 npm run typecheck     # strict TS across both packages
 npm run build         # tsc output for engine + dsh
 ```
 
 The engine package is deliberately dependency-free and framework-agnostic;
 the DSH adapter is a thin, typed wiring layer over the harness services
-(`fs`, `shell`, `tools`, `timer`, `webServer`), configurable through a
+(`fs`, `shell`, `tools`, `timer`, `subagents`; the gateway row additionally
+consumes `webServer`), configurable through a
 schemastery `Config` schema exactly like the official DSH plugins. See the
 [package README](packages/dsh-gatedflow/README.md) for the plugin contract.
 Contributions welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md).

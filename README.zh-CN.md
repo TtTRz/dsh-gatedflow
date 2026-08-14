@@ -37,13 +37,13 @@ prompt 里，任何 agent 都无法在高负载下绕过。
 - **声明式 subflow。** workflow 是 JSON/YAML 数据，加载时结构校验、
   启动时快照——**人批的计划就是执行的计划**。
 - **引擎不含 LLM。** 语义判断在 agent 侧完成并返回**结构化字段**；引擎
-  只计算确定性算子（`==`、`!=`、`>`、`<`、`contains`、`&&`、`||`、`!`）。
+  只计算确定性算子（`==`、`!=`、`>=`、`<=`、`>`、`<`、`contains`、`&&`、`||`、`!`）。
 
 ## 快速开始
 
 ```bash
 npm install
-npm run check   # build + typecheck + 49 个单元测试
+npm run check   # build + typecheck + 单元测试
 ```
 
 ### 跑一个 workflow（DSH 用户视角）
@@ -99,13 +99,14 @@ gf_start({ atomics: [
 
 ```bash
 npm install
-npm run test          # 引擎单元测试（vitest，49 个用例）
+npm run test          # 单元测试（vitest，engine + adapter）
 npm run typecheck     # 两个包的全量严格类型检查
 npm run build         # engine + dsh 的 tsc 产物
 ```
 
 引擎包刻意零依赖、框架无关；DSH 适配层是对 harness 服务
-（`fs`/`shell`/`tools`/`timer`/`subagents`/`webServer`）的薄类型化接线层。
+（`fs`/`shell`/`tools`/`timer`/`subagents`；gateway 行额外消费
+`webServer`）的薄类型化接线层。
 欢迎贡献——见 [`CONTRIBUTING.md`](CONTRIBUTING.md)。
 
 ## 现状

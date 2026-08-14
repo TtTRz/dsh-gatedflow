@@ -47,4 +47,5 @@ examples/subflows/      reference subflow definitions
 
 1. `npm run check` green.
 2. Bump both package versions together.
-3. Tag `v<version>`; publish from the `dist` directories.
+3. Tag `v<version>`; publish from each package's build output
+   (`engine/dist`, `dsh-gatedflow/lib`).

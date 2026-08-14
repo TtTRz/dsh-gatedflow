@@ -63,7 +63,9 @@ context (future extension).
 
 ## 5. One entry point, two paths
 
-`gf_start` accepts only `atomics` (an ordered spec list):
+`gf_start` takes `atomics` (an ordered spec list) plus optional
+`workflow_id` (restore-on-reference, §8) and `workspace_root` (defaults to
+the session workspace):
 
 - **Path ① deterministic** — a single `Ref` runs the named preset; no gate
   wrapper (there is no ad-hoc plan to review).
@@ -127,7 +129,11 @@ does the work, then returns `handoff_complete(result)` or
   keeping a bounded tail (500 lines by default). The DSH filesystem service
   has no append primitive, so the bounded rewrite keeps per-flush cost
   constant.
-- Both live under the engine data directory (`~/.gatedflow` by default).
+- Both live under the session workspace
+  (`<workspace_root>/.gatedflow/workflows`, `<workspace_root>/.gatedflow/audit`)
+  — writable under the sandbox's workspace-write policy by construction;
+  `~/.gatedflow` only supplies the shared subflow scan root (read-only for
+  the plugin).
 
 ## 10. Dependency-inversion seams (engine core)
 
@@ -139,6 +145,9 @@ interface EngineServices {
   timer: DeadlineTimer          // gate deadlines
   agent?: AgentExecutor         // agent step execution (optional)
   audit?: AuditSink             // audit events
+  now?: () => number            // clock injection (tests)
+  defaultGateDeadlineSecs?: number // default 1800
+  defaultShellTimeoutMs?: number   // default 120000
 }
 ```
 
